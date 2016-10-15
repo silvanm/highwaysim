@@ -1,0 +1,21 @@
+{
+  "name": "Simulation of cars in a traffic congestion,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
+    "lite": "lite-server",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "gulp-typescript": "^2.13.0"
+  },
+  "devDependencies": {
+    "concurrently": "^2.0.0",
+    "gulp": "^3.9.1",
+    "jasmine-core": "2.4.1",
+    "lite-server": "^2.2.0",
+    "typescript": "^1.8.10"
+  }
+}

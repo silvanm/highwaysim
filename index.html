@@ -1,0 +1,140 @@
+<html>
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+
+    <script src="js/system@0.19.js"></script>
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.js"></script>
+    <link rel="stylesheet" href="bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css">
+    <script src="bower_components/Snap.svg/dist/snap.svg.js"></script>
+    <script src="js/jquery.sparkline.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div class="container">
+
+    <div>
+        <h1>Highway simulator</h1>
+
+        <p>This little toy is a simple simulator of cars on a highway. There are many reasons
+        that I build such apps: I want to show my kids (and myself) how
+        traffic jams happen. It's an interesting challenge. And besides playing with my kids,
+            run, bike and swim that's what I love doing during my vacations in Spain.
+        </p>
+        <p>As a game try to maximize the throughput. It will show you why traffic will
+        become much more performant once everyone drives self-driving cars.</p>
+        <div class="row">
+            <div class="col-md-6">
+                <form class="form-horizontal">
+                    <div class="form-group ">
+                        <label for="speed" class="col-sm-4 control-label" >Target speed
+                            <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="This is the speed that the car tries to reach"></span></label>
+                        <div class="col-sm-8">
+                            <input id="speed" data-slider-id='speed-slider' type="text"
+                                     data-slider-min="0" data-slider-max="300" data-slider-step="1"
+                                     data-slider-value="50"/>
+                            <span id="speed-display"></span> km/h
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        <label for="speed-variance" class="col-sm-4 control-label">Speed variance
+                            <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="Not every car has exactly the same speed. Control this variance here"></span>
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="speed-variance" data-slider-id='speed-variance-slider' type="text"
+                                     data-slider-min="0" data-slider-max="100" data-slider-step="5"
+                                     data-slider-value="10"/>
+                            <span id="speed-variance-display"></span> % of Target speed
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        <label for="cars-per-minute" class="col-sm-4 control-label">Launch frequency
+                            <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="How many cars should be sent on the road every minute. Note: If there's no room on the road the launching of cars will be paused"></span>
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="cars-per-minute" data-slider-id='cars-per-minute-slider' type="text"
+                                     data-slider-min="0" data-slider-max="120" data-slider-step="1"
+                                     data-slider-value="20"/>
+                            <span id="cars-per-minute-display"></span> per minute
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="cars-per-minute" class="col-sm-4 control-label">Reaction time
+                            <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="How quickly the driver reacts to changing situations on the road."></span>
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="reaction-time" data-slider-id='reaction-time-slider' type="text"
+                                     data-slider-min="0" data-slider-max="5000" data-slider-step="100"
+                                     data-slider-value="200"/>
+                            <span id="reaction-time-display"></span> milliseconds
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label  class="col-sm-4 control-label">Actions</label>
+                        <div class="col-sm-8">
+                            <button class="btn btn-default" type="button" id="start">Launch new car</button>
+                            <button class="btn btn-default" type="button" id="reset">Remove all cars</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-md-6">
+                <table class="table">
+                    <tr>
+                        <th>Average speed</th>
+                        <td><span id="average_speed"></span> <small>km/h</small></td>
+                        <td><span class="speedsparkline">Loading..</span></td>
+                    </tr>
+                    <tr>
+                        <th>Number of cars</th>
+                        <td><span id="active_car_count"></span></td>
+                        <td><span class="active_car_count_sparkline">Loading..</span></td>
+                    </tr>
+                    <tr>
+                        <th>Throughput</th>
+                        <td><span id="througput"></span> <small>cars/min</small></td>
+                        <td><span class="throughput_sparkline">Loading..</span></td>
+                    </tr>
+                    <tr>
+                        <th>Crashes</th>
+                        <td><span id="crashes"></span></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        <svg id="svg" style="width:100%;height:50px;background-color:black" version="1.1"
+             xmlns="http://www.w3.org/2000/svg"></svg>
+
+        <p>Hover over a car to slow it down.</p>
+
+    </div>
+
+</div>
+
+<script>
+
+    System.config({
+        baseURL: '/161012_stausimulator/web/src'
+    });
+    System.import("./src/Main.js").then(function (m) {
+        window.setTimeout(m.run, 1000);
+    });
+</script>
+
+</body>
+</html>

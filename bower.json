@@ -1,0 +1,28 @@
+{
+  "name": "Stausimulator",
+  "description": "Simulation of cars in a traffic congestion",
+  "main": "",
+  "authors": [
+    "Silvan Muehlemann <silvan.muehlemann@muehlemann-popp.ch>"
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "es6-module-loader": "^0.17.11",
+    "traceur": "^0.0.108",
+    "system.js": "^0.19.28",
+    "lodash": "^4.16.4",
+    "bootstrap": "^3.3.7",
+    "seiyria-bootstrap-slider": "^9.2.0"
+  }
+}
