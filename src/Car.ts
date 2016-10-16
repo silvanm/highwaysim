@@ -1,9 +1,4 @@
-/**
- * Created by silvan.muehlemann on 12.10.16.
- *
- * The car uses metric units to measure the behavior
- */
-
+import * as _ from "lodash";
 
 export class Car {
 
@@ -181,10 +176,10 @@ export class Car {
                     this.state = Car.STATE_LAGRUNCONSTANT;
                 } else {
 
-                    this.acceleration = this.minBrakingAcceleration -
-                        10 * 1 / (
-                            Math.min(100,
-                                Math.max(this.distanceToNextCar - this.minDistanceToNextCar, 0.1)))
+                    // This formula is really hard to model. I built it by trial and error...
+                    this.acceleration = (- (10 / _.clamp(this.distanceToNextCar - this.comfortableDistance(), 0.1, 100))
+                        + this.minBrakingAcceleration) * (1)
+                   // console.log("Carid: " + this.id + ", Acceleration: " + this.acceleration + " this.speedDifferenceToNextCar: " + this.speedDifferenceToNextCar )
 
                 }
                 break;
@@ -261,13 +256,13 @@ export class Car {
     brakingNeeded():boolean {
         let result =
             (!this.tooFarFromNextCar()
-            && (this.speedDifferenceToNextCar > 5))
+            && (this.speedDifferenceToNextCar/this.speed > 0.1 ))
         || this.tooCloseToNextCar()
         return result;
     }
 
     tooFarFromNextCar(): boolean {
-        let result = (Math.abs(this.distanceToNextCar) >= this.comfortableDistance() * 1.5)
+        let result = (Math.abs(this.distanceToNextCar) >= this.comfortableDistance() * 2)
         return result;
     }
 

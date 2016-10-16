@@ -167,7 +167,8 @@ class Main {
             + (1 - 2 * Math.random()) * $('#speed-variance').slider().data('slider').getValue() * speed / 100;
 
         // the lane is selected based on the average speed of all cars and a random component
-        car.lane = car.fullspeed >= speed * (0.5 - Math.random()) * 5  ? 0 : 1;
+//        car.lane = car.fullspeed > speed * (0.5 - Math.random()) * 5  ? 0 : 1;
+        car.lane = Math.random() > 0.5 ? 0 : 1;
 
         car.run(car.fullspeed);
         car.collisionCallback = function () {
@@ -192,6 +193,9 @@ class Main {
                 Car.dimensions.length * Main.meterToPixel
             )
             .hover(function () {
+                car.manualBraking();
+            })
+            .click(function () {
                 car.manualBraking();
             })
     }
