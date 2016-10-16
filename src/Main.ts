@@ -21,6 +21,9 @@ class Main {
 
     lanes:number = 2;
 
+    // change this to easily change the size of the car. Good values are 4 and 8
+    meterToPixel = 8;
+
     // Stores the average speed history. Used to display the sparklines
     stats:Statentry[] = [];
 
@@ -30,8 +33,6 @@ class Main {
 
     crashCounter:number = 0;
 
-
-    public static meterToPixel = 8;
 
     public static widthOfLane:number = 3;
 
@@ -44,7 +45,7 @@ class Main {
         let self = this;
         window.setInterval(function () {
             self.updateStats()
-        }, 1000);
+        }, 2000);
 
         _.each(['cars-per-minute', 'reaction-time', 'speed', 'speed-variance'], this.initSlider);
 
@@ -90,8 +91,8 @@ class Main {
 
         _.each(this.cars, function (car:Car) {
             car.update();
-            car.svgObj.attr('x', car.position * Main.meterToPixel - Car.dimensions.length * Main.meterToPixel);
-            car.svgObj.attr('y', car.lane * Main.widthOfLane * Main.meterToPixel);
+            car.svgObj.attr('x', car.position * self.meterToPixel - Car.dimensions.length * self.meterToPixel);
+            car.svgObj.attr('y', car.lane * Main.widthOfLane * self.meterToPixel);
 
             if (car.stateColors[car.state] == 'red') {
                 car.svgObj.attr('href', 'img/car_braking.png?a=3')
@@ -102,7 +103,7 @@ class Main {
             }
 
             // Removing cars which have passed the full track
-            if (car.position * Main.meterToPixel - Car.dimensions.length * Main.meterToPixel > self.roadLengthPixel) {
+            if (car.position * self.meterToPixel - Car.dimensions.length * self.meterToPixel > self.roadLengthPixel) {
                 car.svgObj.remove();
                 car.svgObj = null;
                 self.passedCars.push(Date.now());
@@ -175,8 +176,8 @@ class Main {
             self.crashCounter++;
             let explosionSvg = self.svg.image(
                 "img/explosion.gif?a=2",
-                car.position * Main.meterToPixel - Main.meterToPixel,
-                (car.lane) * Main.meterToPixel * Main.widthOfLane - 15,
+                car.position * this.meterToPixel - this.meterToPixel,
+                (car.lane) * this.meterToPixel * Main.widthOfLane - 15,
                 50,
                 50);
             window.setTimeout(function () {
@@ -189,8 +190,8 @@ class Main {
         car.svgObj = this.svg.image("img/car_normal.png?a=2",
             0,
             12,
-                Car.dimensions.length * Main.meterToPixel,
-                Car.dimensions.length * Main.meterToPixel
+                Car.dimensions.length * this.meterToPixel,
+                Car.dimensions.length * this.meterToPixel
             )
             .hover(function () {
                 car.manualBraking();
@@ -276,5 +277,14 @@ export function run() {
 
     $('#reset').on('click', function () {
         main.removeAllCars()
+    })
+
+    $('#toggle-size').on('click', function () {
+        main.removeAllCars()
+        if (main.meterToPixel == 4) {
+            main.meterToPixel = 8
+        } else {
+            main.meterToPixel = 4
+        }
     })
 }

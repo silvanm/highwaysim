@@ -12,12 +12,9 @@
     <link rel="stylesheet" href="bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css">
     <script src="bower_components/Snap.svg/dist/snap.svg.js"></script>
     <script src="js/jquery.sparkline.min.js"></script>
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-    <!-- Optional theme -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
 
-    <!-- Latest compiled and minified JavaScript -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="styles.css">
@@ -27,15 +24,19 @@
 <div class="container">
 
     <div>
-        <h1>Highway simulator</h1>
+        <h1>Simple Highway Simulator</h1>
 
-        <p>This little toy is a simple simulator of cars on a highway. There are many reasons
+        <p>This little toy is a simple simulator of cars on a highway. Play with the parameters or
+            stop a car by touching it. As a game try to maximize the throughput. It will show you why traffic will
+            become much more performant once everyone drives self-driving cars.
+            </p>
+
+        <p><b>What's the point?</b> There are many reasons
         that I build such apps: I want to show my kids (and myself) how
         traffic jams happen. It's an interesting challenge. And besides playing with my kids,
-            run, bike and swim that's what I love doing during my vacations in Spain.
+            run, bike and swim that's what I <em>love</em> doing during my vacations in Spain.
         </p>
-        <p>As a game try to maximize the throughput. It will show you why traffic will
-        become much more performant once everyone drives self-driving cars.</p>
+        <p></p>
         <div class="row">
             <div class="col-md-6">
                 <form class="form-horizontal">
@@ -44,7 +45,7 @@
                             <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="This is the speed that the car tries to reach"></span></label>
                         <div class="col-sm-8">
                             <input id="speed" data-slider-id='speed-slider' type="text"
-                                     data-slider-min="0" data-slider-max="300" data-slider-step="1"
+                                     data-slider-min="0" data-slider-max="150" data-slider-step="1"
                                      data-slider-value="50"/>
                             <span id="speed-display"></span> km/h
                         </div>
@@ -69,7 +70,7 @@
                         <div class="col-sm-8">
                             <input id="cars-per-minute" data-slider-id='cars-per-minute-slider' type="text"
                                      data-slider-min="0" data-slider-max="120" data-slider-step="1"
-                                     data-slider-value="20"/>
+                                     data-slider-value="40"/>
                             <span id="cars-per-minute-display"></span> per minute
                         </div>
                     </div>
@@ -79,7 +80,7 @@
                         </label>
                         <div class="col-sm-8">
                             <input id="reaction-time" data-slider-id='reaction-time-slider' type="text"
-                                     data-slider-min="0" data-slider-max="5000" data-slider-step="100"
+                                     data-slider-min="0" data-slider-max="2000" data-slider-step="100"
                                      data-slider-value="200"/>
                             <span id="reaction-time-display"></span> milliseconds
                         </div>
@@ -89,6 +90,7 @@
                         <div class="col-sm-8">
                             <button class="btn btn-default" type="button" id="start">Launch new car</button>
                             <button class="btn btn-default" type="button" id="reset">Remove all cars</button>
+                            <button class="btn btn-default" type="button" id="toggle-size">Toggle size</button>
                         </div>
                     </div>
 
