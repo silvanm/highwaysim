@@ -1,3 +1,19 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
+
+.labelId {
+    display: none;
+}
+
+.stateIndicator {
+    display: none;
+}
+
+.debugMode .labelId {
+    display: inherit;
+}
+
+.debugMode .stateIndicator {
+    display: inherit;
+}
