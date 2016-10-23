@@ -28,14 +28,13 @@ export class Car {
     public stateColors = {
         'runconstant': 'white',
         'lagrunconstant': 'gray',
-        'lagbraking': 'orange red',
+        'lagbraking': 'orangered',
         'braking': 'red',
         'manualbraking' : 'red',
         'stopped': 'red',
-        'lagaccelerating': 'cyan',
-        'accelerating': 'blue',
-        'collision': 'green',
-        'lanechange': 'magenta'
+        'lagaccelerating': 'green',
+        'accelerating': 'lightgreen',
+        'collision': 'brown'
     };
 
     // Dimensions in meter
@@ -126,6 +125,8 @@ export class Car {
 
     svgRect: any;
 
+    svgLabel: any;
+
     // the turn indicators
     blinkLeft : any;
     blinkRight : any;
@@ -196,6 +197,7 @@ export class Car {
         this.lastUpdate = Date.now();
     }
 
+
     createSvg(svg, meterToPixel) {
         let self = this;
         let img = svg.image("img/car_normal.png?a=2",
@@ -210,8 +212,9 @@ export class Car {
             Car.dimensions.length * meterToPixel
         )
 
-        let label = svg.text(10, 10, this.id).attr('fill', 'white');
-        label.attr('class', 'labelId')
+        let idLabel = svg.text(3 * meterToPixel, 10, this.id).attr('class', 'labelId').attr('fill', 'white').attr('font-size', '12');
+        this.svgLabel = svg.text(3 * meterToPixel, 20, "-").attr('fill', 'white').attr('font-size', '12');
+        this.svgLabel.attr('class', 'labelId')
 
         this.blinkLeft = svg.image("img/blink_left.gif",
         0,
@@ -229,7 +232,7 @@ export class Car {
 
         )
 
-        let g = svg.group(img, this.blinkLeft, this.blinkRight, rect, label);
+        let g = svg.group(img, this.blinkLeft, this.blinkRight, rect, idLabel, this.svgLabel);
         rect.attr('opacity', '0.5');
         rect.attr('class', 'stateIndicator')
 
@@ -245,6 +248,7 @@ export class Car {
             })
 
         this.updateBlinkers()
+        this.updateLabel()
     }
     
     updateSvg(x, y) {
@@ -259,6 +263,10 @@ export class Car {
         }
 
         this.svgRect.attr('fill', this.stateColors[this.state]);
+    }
+
+    updateLabel() {
+        this.svgLabel.attr('text', Math.round(this.speed) + "km/h")
     }
 
     updateBlinkers() {
@@ -435,17 +443,20 @@ export class Car {
         if (_.indexOf([Car.STATE_COLLISION, Car.STATE_STOPPED], this.state) >= 0)
             return false;
 
-                // no lane switch if we're slower than the car in front
+        // no lane switch if we're slower than the car in front
         if (
             !_.isNumber(this.speedDifferenceToNextCar) ||
             this.speedDifferenceToNextCar/this.speed < 0.1)
+            return false;
+
+        if (this.speed < 30)
             return false;
 
         // no lane switch if we just have completed the last lane switch
         if (Date.now() - this.lanechangeData.lastSwitchAt < 10000 )
             return false;
 
-        // no lane switching if no car in front (or car too far away
+        // no lane switching if no car in front (or car too far away)
         if (this.adjacentCars.sameLane.nextCar == null
         || (this.adjacentCars.sameLane.nextCar.position - this.position > this.comfortableDistance() * 2)
         )

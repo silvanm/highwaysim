@@ -4,6 +4,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <meta property="og:title"              content="Simple Highway Simulator" />
+    <meta property="og:description"        content="This little app is a simple simulator of cars on a highway. Play with the parameters or
+                stop any car by touching it." />
+    <meta property="og:image"              content="http://xn--mhlemann-65a.ch/stausimulator/img/og-image.png" />
+
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
 
     <script src="js/system@0.19.js"></script>
@@ -45,15 +50,16 @@
             <h1>Simple Highway Simulator</h1>
 
             <p>This little app is a simple simulator of cars on a highway. Play with the parameters or
-                stop any car by touching it. As a game try to maximize the throughput. It will show you why traffic
-                will
-                become much more performant once everyone drives self-driving cars.
+                stop any car by touching it.
+                As a game try to maximize the throughput by playing with the parameters. It will show you why traffic
+                will become much more performant once everyone drives self-driving cars.
             </p>
+
         </div>
     </div>
 
 
-    <div class="row">
+    <div class="row hide-until-loaded">
         <div class="col-md-6">
             <form class="form-horizontal">
 
@@ -61,11 +67,12 @@
                 <div id="sliders"></div>
 
                 <div class="form-group ">
-                    <label class="col-sm-4 control-label">Debug mode</label>
+                    <label class="col-sm-4 control-label">Debug mode
+                        <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
+                              title="Adds an overlay to the car showing the current state of the state machine"></span>
+                    </label>
                     <div class="checkbox col-sm-8">
-                        <label>
-                            <input type="checkbox" id="debugMode">
-                        </label>
+                        <input type="checkbox" id="debugMode">
                     </div>
                 </div>
                 <div class="form-group ">
@@ -135,17 +142,20 @@
 
             <h3>What's the point?</h3>
             <p> There are many reasons
-                that I build this app: I want to show my kids (and myself) how
-                traffic jams happen. It's an interesting challenge. It gives me some programming practice (<a
-                        href="http://muehlemann-popp.ch" target="_blank">I am mostly manager</a>). And besides
-                playing
-                with
-                my kids,
-                run, bike and swim that's what I <em>loved</em> doing during my vacations in Spain.
+                that I built this app:
+                I was in my vacations in Spain with my family. Some like tanning on the beach or
+                reading books. I like coding.
+                It's an interesting challenge. It gives me some programming practice (<a
+                        href="http://muehlemann-popp.ch" target="_blank">I am mostly manager</a>).
+                And the result is a app my kids (6 and 8 years old) also enjoy playing with.
             </p>
 
             <h3>Technical details</h3>
-            <p>Typescript, SVG and a simple state machine for each car. Find the source code <a
+            <p>Typescript, SVG and a simple state machine for each car. The cars are not very smart.
+                The code is not very pretty.
+                Edge cases are not handled well. And it performs badly on low-CPU devices.
+                Memory leaks? Probably yes.
+                Find the source code <a
                     href="https://bitbucket.org/silvanm75/highwaysim">here</a>.</p>
         </div>
 
@@ -161,7 +171,7 @@
     });
 
     System.import("./src/Main.js").then(function (m) {
-        window.setTimeout(m.run, 1000);
+        window.setTimeout(m.run);
     });
 </script>
 

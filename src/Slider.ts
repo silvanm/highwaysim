@@ -10,7 +10,7 @@ export interface Slideroptions {
     value:number;
     max:number;
     unitlabel:string;
-    helptext?:string;
+    helptext:string;
 
 }
 

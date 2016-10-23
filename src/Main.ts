@@ -43,6 +43,8 @@ class Main {
 
     // Stores the average speed history. Used to display the sparklines
     stats:Statentry[] = [];
+    averageSpeed:number = 0;
+
 
     // Stores the timestamps when cars have passed the track.
     // Used to calculate the throughput
@@ -70,7 +72,7 @@ class Main {
             {
                 'name' : 'speed',
                 'label' : 'Target speed',
-                'tooltip' : 'This is the speed that the car tries to reach',
+                'helptext' : 'This is the speed that the car tries to reach',
                 'step' : 1,
                 'max' : 150,
                 'unitlabel': 'km/h',
@@ -79,7 +81,7 @@ class Main {
             {
                 'name' : 'speed-variance',
                 'label' : 'Speed variance',
-                'tooltip' : 'Not every car has exactly the same speed. Control this variance here',
+                'helptext' : 'Not every car has exactly the same speed. Control this variance here',
                 'step' : 5,
                 'max' : 100,
                 'unitlabel': '% of target speed',
@@ -88,7 +90,7 @@ class Main {
             {
                 'name' : 'cars-per-minute',
                 'label' : 'Launch frequency',
-                'tooltip' : 'How many cars should be sent on the road every minute. Note: If there\'s no room on the road the launching of cars will be paused',
+                'helptext' : 'How many cars should be sent on the road every minute. Note: If there\'s no room on the road the launching of cars will be paused',
                 'step' : 5,
                 'max' : 120,
                 'unitlabel': 'cars/minute',
@@ -97,16 +99,16 @@ class Main {
             {
                 'name' : 'reaction-time',
                 'label' : 'Reaction time',
-                'tooltip' : 'How quickly the driver reacts to changing situations on the road.',
-                'step' : 100,
-                'max' : 5000,
+                'helptext' : 'How quickly the driver reacts to changing situations on the road.',
+                'step' : 50,
+                'max' : 2000,
                 'unitlabel': 'milliseconds',
                 'value' : 200
             },
             {
                 'name' : 'acceleration',
                 'label' : 'Acceleration power',
-                'tooltip' : 'How quickly a car can accelerate',
+                'helptext' : 'How quickly a car can accelerate',
                 'step' : 5,
                 'max' : 50,
                 'unitlabel': 'km/h/s',
@@ -131,10 +133,11 @@ class Main {
         let carsPerMinute = $('#cars-per-minute').slider().data('slider').getValue()
         if (carsPerMinute > 0) {
 
+
             // Check if it's safe to launch a car.
             // There needs to be some room on the left side to be able to launch a car
             if (this.cars.length == 0
-                || this.cars[this.cars.length - 1].position > Main.getSpeedFromSlider() / 3 / 3600 * 1000) {
+                || this.cars[this.cars.length - 1].position > Main.getSpeedFromSlider() / 2 / 3600 * 1000) {
                 self.addCar();
             }
 
@@ -311,7 +314,7 @@ class Main {
 //        car.lane = car.fullspeed > speed * (0.5 - Math.random()) * 5  ? 0 : 1;
         car.lane = Math.random() > 0.5 ? 0 : 1;
 
-        car.run(car.fullspeed);
+        car.run(this.averageSpeed ? this.averageSpeed : car.fullspeed);
         car.collisionCallback = function () {
             self.crashCounter++;
             let explosionSvg = self.svg.image(
@@ -352,7 +355,7 @@ class Main {
 
         let statEntry = new Statentry();
         statEntry.activeCarCount = self.cars.length;
-        statEntry.averageSpeed = Math.round(self.getAverageSpeed());
+        this.averageSpeed = statEntry.averageSpeed = Math.round(self.getAverageSpeed());
         statEntry.throughput = _.filter(self.passedCars, function (timestamp) {
             return (Date.now() - timestamp) < 60000
         }).length;
@@ -372,6 +375,12 @@ class Main {
                 }).splice(-50)
             );
         })
+
+        if (this.debugMode) {
+            _.each(this.cars, function(car:Car) {
+                car.updateLabel();
+            })
+        }
 
         $("#crashes").text(self.crashCounter);
 
@@ -415,8 +424,10 @@ export function run() {
     $('#debugMode').on('change', function () {
         if ($('#debugMode').prop('checked')) {
             $('body').addClass("debugMode");
+            main.debugMode = true;
         } else {
             $('body').removeClass("debugMode");
+            main.debugMode = false;
         }
     });
 }
