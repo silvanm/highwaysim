@@ -1,5 +1,5 @@
 {
-  "name": "Simulation of cars in a traffic congestion,
+  "name": "Simulation of cars in a traffic congestion",
   "version": "1.0.0",
   "scripts": {
     "start": "tsc && concurrently \"npm run tsc:w\" \"npm run lite\" ",
@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "circularbuffer": "^0.1.1",
     "gulp-typescript": "^2.13.0"
   },
   "devDependencies": {

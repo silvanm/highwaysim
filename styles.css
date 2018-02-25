@@ -21,3 +21,11 @@ body {
 .debugMode .stateIndicator {
     display: inherit;
 }
+
+.debugMode #brainstats {
+    display: table;
+}
+
+#brainstats {
+    display: none;
+}

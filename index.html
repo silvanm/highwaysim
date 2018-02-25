@@ -4,17 +4,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta property="og:title"              content="Simple Highway Simulator" />
-    <meta property="og:url"              content="http://xn--mhlemann-65a.ch/highwaysim/" />
-    <meta property="og:description"        content="This little app is a simple simulator of cars on a highway. Play with the parameters or
-                stop any car by touching it." />
-    <meta property="og:image"              content="http://xn--mhlemann-65a.ch/highwaysim/img/og-image.png" />
+    <meta property="og:title" content="Simple Highway Simulator"/>
+    <meta property="og:url" content="http://xn--mhlemann-65a.ch/highwaysim/"/>
+    <meta property="og:description" content="This little app is a simple simulator of cars on a highway. Play with the parameters or
+                stop any car by touching it."/>
+    <meta property="og:image" content="http://xn--mhlemann-65a.ch/highwaysim/img/og-image.png"/>
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="597">
 
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
 
     <script src="js/system@0.19.js"></script>
+    <script type="text/javascript" src="js/rl.js"></script>
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.js"></script>
     <link rel="stylesheet" href="bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css">
@@ -33,10 +34,10 @@
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
         i[r] = i[r] || function () {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
         a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
+            m = s.getElementsByTagName(o)[0];
         a.async = 1;
         a.src = g;
         m.parentNode.insertBefore(a, m)
@@ -55,7 +56,7 @@
             <p>This little app is a simple simulator of cars on a highway. Play with the parameters or
                 stop any car by touching it.
                 As a game try to maximize the throughput by playing with the parameters. It will show you why traffic
-                will become much more performant once everyone drives self-driving cars.
+                will become much more performant and use less resources once everyone drives self-driving cars.
             </p>
 
         </div>
@@ -79,6 +80,20 @@
                     </div>
                 </div>
                 <div class="form-group ">
+                    <label class="col-sm-4 control-label">Kind of AI
+                        <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
+                              title="Type of AI which is used in the car. &quot;State machine&quot; is the more robust one."></span>
+                    </label>
+                    <div class="checkbox col-sm-8" id="ai_type" >
+                        <label class="radio-inline">
+                            <input type="radio" id="inlineRadio1" name="ai_type" value="state_machine" checked> State machine
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" id="inlineRadio2" name="ai_type"  value="deep_q"> Deep-Q Learning
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group ">
                     <label class="col-sm-4 control-label">Actions</label>
                     <div class="col-sm-8">
                         <button class="btn btn-default" type="button" id="start">Launch new car</button>
@@ -92,7 +107,8 @@
         <div class="col-md-6">
             <table class="table">
                 <tr>
-                    <th>Average speed <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
+                    <th>Average speed <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                            data-placement="top"
                                             title="Average speed of all visible cars"></span></th>
                     <td><span id="averageSpeed"></span>
                         <small>km/h</small>
@@ -100,22 +116,27 @@
                     <td><span class="averageSpeedsparkline">Loading..</span></td>
                 </tr>
                 <tr>
-                    <th>Number of cars <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
+                    <th>Number of cars <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                             data-placement="top"
                                              title="Number of visible cars"></span></th>
                     <td><span id="activeCarCount"></span></td>
                     <td><span class="activeCarCountsparkline">Loading..</span></td>
                 </tr>
                 <tr>
-                    <th>Throughput <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
-                                         title="Number of cars drove across the screen. This should be as high as possible."></span></th>
+                    <th>Throughput <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                         data-placement="top"
+                                         title="Number of cars drove across the screen. This should be as high as possible."></span>
+                    </th>
                     <td><span id="throughput"></span>
                         <small>cars/min</small>
                     </td>
                     <td><span class="throughputsparkline">Loading..</span></td>
                 </tr>
                 <tr>
-                    <th>Fuel consumption <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top"
-                                               title="An approximation of the fuel consumption of the car. Accelerating is more expensive than just driving constantly. This should obviously be as low as possible."></span></th>
+                    <th>Fuel consumption <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="An approximation of the fuel consumption of the car. Accelerating is more expensive than just driving constantly. This should obviously be as low as possible."></span>
+                    </th>
                     <td><span id="fuelConsumption"></span>
                         <small>units/car</small>
                     </td>
@@ -144,8 +165,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-
             <p>Hover or click on a car to slow it down.</p>
+
+            <div id="brainstats"></div>
 
             <h3>What's the point?</h3>
             <p> There are many reasons
@@ -154,16 +176,18 @@
                 reading books. I like coding.
                 It's an interesting challenge. It gives me some programming practice (<a
                         href="http://muehlemann-popp.ch" target="_blank">I am mostly manager</a>).
-                And the result is a app my kids (6 and 8 years old) also enjoy playing with.
+                And the result is an app my kids (6 and 8 years old) also enjoy playing with.
             </p>
 
             <h3>Technical details</h3>
-            <p>Typescript, SVG and a simple state machine for each car. The cars are not very smart.
+            <p>Typescript, SVG and a simple state machine for each car (You can call it AI if you want ;-). The cars are
+                not very smart.
                 The code is not very pretty.
                 Edge cases are not handled well. And it performs badly on low-CPU devices.
                 Memory leaks? Probably yes.
                 Find the source code <a
-                    href="https://bitbucket.org/silvanm75/highwaysim">here</a>.</p>
+                        href="https://bitbucket.org/silvanm75/highwaysim">here</a>.</p>
+            <p><a href="http://mühlemann.ch">Silvan Mühlemann</a>, 23.10.2016</p>
         </div>
 
     </div>

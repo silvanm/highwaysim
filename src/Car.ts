@@ -1,7 +1,9 @@
 import * as _ from "lodash";
 import { AdjacentCars, AdjacentCarsPerLane } from "./Main";
+import {Ticker} from "./Ticker";
+import {AICar} from "./AICar";
 
-interface LanechangeData {
+export interface LanechangeData {
     startAt : number
     startLaneId : number
     destLaneId : number
@@ -22,7 +24,6 @@ export class Car {
     public static STATE_COLLISION = 'collision';
 
     public static LANECHANGE_STATE_CONSTANT = 'constant';
-    public static LANECHANGE_STATE_CHANGE = 'laglanechange';
     public static LANECHANGE_STATE_CHANGE = 'lanechange';
 
     public stateColors = {
@@ -133,10 +134,21 @@ export class Car {
 
     adjacentCars : AdjacentCars;
 
+    // constansts necessary for the Reinforcment learning
+
+    roadLengthPixel: number;
+
+    meterToPixels: number;
+
+    ticker: Ticker;
+
+
     constructor(id:number,
                 fullspeed:number = 50,
-                lane:number = 1) {
-        this.lastUpdate = Date.now();
+                lane:number = 1,
+                ticker:Ticker) {
+        this.ticker = ticker;
+        this.lastUpdate = this.ticker.now();
         this.id = id;
         this.lane = lane;
         this.speed = 0;
@@ -158,6 +170,7 @@ export class Car {
         }
     }
 
+
     run(speed:number) {
         this.state = Car.STATE_RUNCONSTANT;
         this.speed = speed;
@@ -170,7 +183,7 @@ export class Car {
         this.updateState();
         this.updateSpeed();
 
-        let millisSinceLastUpdate = (Date.now() - this.lastUpdate)
+        let millisSinceLastUpdate = (this.ticker.now() - this.lastUpdate)
         // update the position
         this.position += (this.speed * 1000 / (3600 * 1000) * millisSinceLastUpdate)
 
@@ -182,7 +195,7 @@ export class Car {
                 this.lane = this.lanechangeData.destLaneId
                 this.lanechangeData.completionQuota = 0;
                 this.lanechangeData.startAt = null;
-                this.lanechangeData.lastSwitchAt = Date.now();
+                this.lanechangeData.lastSwitchAt = this.ticker.now();
                 this.updateBlinkers()
             } else {
                 this.lanechangeData.completionQuota = newCompletionQuota;
@@ -194,7 +207,7 @@ export class Car {
         // assumption: fuel usage ^2 to the speed and ^3 to the acceleration
         this.fuelConsumption += millisSinceLastUpdate * ((Math.pow(this.speed, 2) + Math.pow(Math.max(this.acceleration * 2, 0), 3))) / 1000
 
-        this.lastUpdate = Date.now();
+        this.lastUpdate = this.ticker.now();
     }
 
 
@@ -212,7 +225,7 @@ export class Car {
             Car.dimensions.length * meterToPixel
         )
 
-        let idLabel = svg.text(3 * meterToPixel, 10, this.id).attr('class', 'labelId').attr('fill', 'white').attr('font-size', '12');
+        let idLabel = svg.text(3 * meterToPixel, 10, this.id + ("brain" in this ? " AI" : "")).attr('class', 'labelId').attr('fill', 'white').attr('font-size', '12');
         this.svgLabel = svg.text(3 * meterToPixel, 20, "-").attr('fill', 'white').attr('font-size', '12');
         this.svgLabel.attr('class', 'labelId')
 
@@ -296,7 +309,7 @@ export class Car {
     manualBraking() {
         this.speed -= 10;
         this.state = Car.STATE_MANUALBRAKING;
-        this.lagStart = Date.now();
+        this.lagStart = this.ticker.now();
     }
 
     updateState() {
@@ -307,7 +320,7 @@ export class Car {
                 if (this.laneChangeNeeded()) {
                     this.lanechange_state = Car.LANECHANGE_STATE_CHANGE;
                     this.lanechangeData = {
-                        startAt: Date.now(),
+                        startAt: this.ticker.now(),
                         startLaneId: this.lane,
                         destLaneId: 1 - this.lane,
                         completionQuota: 0,
@@ -333,12 +346,12 @@ export class Car {
                     this.speed = 0
                 } else if (this.brakingNeeded()) {
                     this.state = Car.STATE_LAGBRAKING;
-                    this.lagStart = Date.now();
+                    this.lagStart = this.ticker.now();
                 } else if ((this.speed < this.fullspeed)
                     && !this.tooCloseToNextCar()
                     // next car should not be stopped
                     && (_.isUndefined(this.nextCar) || this.speed > 0)) {
-                    this.lagStart = Date.now();
+                    this.lagStart = this.ticker.now();
                     this.state = Car.STATE_LAGACCELERATING;
                 }
 
@@ -347,7 +360,7 @@ export class Car {
             case Car.STATE_LAGBRAKING:
                 if (this.isCollision()) {
                     this.state = Car.STATE_COLLISION
-                } else if ((Date.now() - this.lagStart) >= this.reactionTime) {
+                } else if ((this.ticker.now() - this.lagStart) >= this.reactionTime) {
                     this.state = Car.STATE_BRAKING;
                     this.lagStart = null;
                 }
@@ -361,7 +374,7 @@ export class Car {
                     this.speed = 0
                 } else if (this.speedDifferenceToNextCar < 0) {
                     // The other car is faster
-                    this.lagStart = Date.now();
+                    this.lagStart = this.ticker.now();
                     this.state = Car.STATE_LAGRUNCONSTANT;
                 } else {
 
@@ -374,7 +387,7 @@ export class Car {
                 break;
 
             case Car.STATE_MANUALBRAKING:
-                if ((Date.now() - this.lagStart) >= 500) {
+                if ((this.ticker.now() - this.lagStart) >= 500) {
                     this.state = Car.STATE_LAGRUNCONSTANT;
                     this.lagStart = null;
                 }
@@ -383,7 +396,7 @@ export class Car {
             case Car.STATE_LAGRUNCONSTANT:
                 if (this.isCollision()) {
                     this.state = Car.STATE_COLLISION
-                } else if ((Date.now() - this.lagStart) >= this.reactionTime) {
+                } else if ((this.ticker.now() - this.lagStart) >= this.reactionTime) {
                     this.state = Car.STATE_RUNCONSTANT;
                     this.acceleration = 0;
                 }
@@ -391,7 +404,7 @@ export class Car {
 
             case Car.STATE_STOPPED:
                 if (this.distanceToNextCarCalc() > this.minBrakingAcceleration) {
-                    this.lagStart = Date.now();
+                    this.lagStart = this.ticker.now();
                     this.state = Car.STATE_LAGACCELERATING;
                 }
                 break;
@@ -399,7 +412,7 @@ export class Car {
             case Car.STATE_LAGACCELERATING:
                 if (this.isCollision()) {
                     this.state = Car.STATE_COLLISION
-                } else if ((Date.now() - this.lagStart) >= this.reactionTime) {
+                } else if ((this.ticker.now() - this.lagStart) >= this.reactionTime) {
                     this.lagStart = null;
                     this.state = Car.STATE_ACCELERATING;
                 }
@@ -423,9 +436,9 @@ export class Car {
             case Car.STATE_COLLISION:
                 this.speed = 0;
                 if (this.collisionStart == null) {
-                    this.collisionStart = Date.now();
+                    this.collisionStart = this.ticker.now();
                     this.collisionCallback();
-                } else if ((Date.now() - this.collisionStart) >= 3000
+                } else if ((this.ticker.now() - this.collisionStart) >= 3000
                 && this.distanceToNextCarCalc() > this.comfortableDistance()) {
                     this.collisionStart = null;
                     this.acceleration = 0;
@@ -453,7 +466,7 @@ export class Car {
             return false;
 
         // no lane switch if we just have completed the last lane switch
-        if (Date.now() - this.lanechangeData.lastSwitchAt < 10000 )
+        if (this.ticker.now() - this.lanechangeData.lastSwitchAt < 10000 )
             return false;
 
         // no lane switching if no car in front (or car too far away)
@@ -468,15 +481,20 @@ export class Car {
             return false;
 
         let otherLane = this.lane == 1 ? 'fasterLane' : 'slowerLane';
-            // enough space on other lane in front
 
+        // enough space on other lane in front
         if  ((this.adjacentCars[otherLane].nextCar == null || this.adjacentCars[otherLane].nextCar.removed ||
             (this.adjacentCars[otherLane].nextCar.position - this.position) > this.comfortableDistance())
             // enough space on other lane in back
             && (this.adjacentCars[otherLane].previousCar == null ||
-        (this.position - this.adjacentCars[otherLane].previousCar.position) > this.comfortableDistance()))
+        (this.position - this.adjacentCars[otherLane].previousCar.position) > this.comfortableDistance() / 2))
       {
-            return true;
+          // don't switch if the car in the other lane is faster
+          if  (this.adjacentCars[otherLane].nextCar != null && !this.adjacentCars[otherLane].nextCar.removed
+              && (this.adjacentCars[otherLane].nextCar.speed < this.speed ))
+                return false;
+
+              return true;
         }
 
         return false;
@@ -518,7 +536,7 @@ export class Car {
     }
 
     updateSpeed() {
-        this.speed += (Date.now() - this.lastUpdate) / 1000 * this.acceleration;
+        this.speed += (this.ticker.now() - this.lastUpdate) / 1000 * this.acceleration;
 
         // The speed always occiliates
         //this.speed += Math.sin(this.lastUpdate / 1000 / 3.1412 / 2 ) * this.speedVariance
