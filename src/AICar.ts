@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import * as _ from "../node_modules/lodash/lodash.js"
 import {BrainStoreElem} from "./Main";
 import {Car, LanechangeData} from "./Car";
 import {Ticker} from "./Ticker";

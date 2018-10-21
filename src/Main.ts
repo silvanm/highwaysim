@@ -1,7 +1,7 @@
 import {Car} from "./Car";
 import {AICar} from "./AICar";
 import {Slider} from "./Slider";
-import * as _ from "lodash";
+import * as _ from "../node_modules/lodash/lodash.js"
 import {Brainstats} from "./Brainstats";
 import {Ticker} from "./Ticker";
 

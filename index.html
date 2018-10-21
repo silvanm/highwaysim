@@ -7,12 +7,12 @@
     <meta property="og:title" content="Simple Highway Simulator"/>
     <meta property="og:url" content="http://xn--mhlemann-65a.ch/highwaysim/"/>
     <meta property="og:description" content="This little app is a simple simulator of cars on a highway. Play with the parameters or
-                stop any car by touching it."/>
+                stop any car by touching it. Choose between two kind of AI engines"/>
     <meta property="og:image" content="http://xn--mhlemann-65a.ch/highwaysim/img/og-image.png"/>
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="597">
 
-    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
 
     <script src="js/system@0.19.js"></script>
     <script type="text/javascript" src="js/rl.js"></script>
@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
 
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/lodash/dist/lodash.core.js"></script>
 
     <link rel="stylesheet" href="styles.css">
 
@@ -191,6 +192,28 @@
         </div>
 
     </div>
+
+    <div id="disqus_thread"></div>
+    <script>
+
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+        var disqus_config = function () {
+            this.page.url = "https://xn--mhlemann-65a.ch/highwaysim/";  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = '1'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://muehlemann.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
 </div>
 
 

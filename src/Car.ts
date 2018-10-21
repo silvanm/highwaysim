@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import * as _ from "../node_modules/lodash/lodash.js"
 import { AdjacentCars, AdjacentCarsPerLane } from "./Main";
 import {Ticker} from "./Ticker";
 import {AICar} from "./AICar";
